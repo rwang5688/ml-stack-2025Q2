@@ -1,0 +1,4 @@
+{
+  "httpMethod": "POST",
+  "body": "{\"messages\":[{\"role\":\"user\",\"content\":[{\"text\":\"how are you today?\"}]}]}"
+}

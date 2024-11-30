@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Unicare Patient Medicard Records API",
+    "version": "1.0.0",
+    "description": "APIs for managing patients by pulling list of active patients and identifying medical details."
+  },
+  "paths": {
+    "/patient/{patientId}/detail": {
+      "get": {
+        "summary": "Gets all details about a specific patient",
+        "description": "Gets all details about a specific patient given a patient id.",
+        "operationId": "getPatientDetail",
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "description": "Unique ID of the patient",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of the patient",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "patient_id": {
+                      "type": "integer",
+                      "description": "Unique identifier for the patient."
+                    },
+                    "condition": {
+                      "type": "string",
+                      "description": "Health condition."
+                    },
+                    "last_activity_date": {
+                      "type": "string",
+                      "description": "Date of last activity."
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Patient status. One of: Active, Inactive."
+                    },
+                    "policy_type": {
+                      "type": "string",
+                      "description": "Policy type. One of: Gold, Silver, Bronze, Platinum."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
