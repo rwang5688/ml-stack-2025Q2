@@ -8,6 +8,10 @@
 
 Jupyter Notebook: https://github.com/aws/studio-lab-examples/blob/c154a9a009227c50e8af3be308fe475a7abd607f/connect-to-aws/Access_AWS_from_Studio_Lab_Deployment.ipynb
 
+### SageMaker Model Deployment: Build Text Summarization with Llama using Amazon SageMaker JumpStart
+
+Lab: https://catalog.us-east-1.prod.workshops.aws/workshops/63069e26-921c-4ce1-9cc7-dd882ff62575/en-US/lab7-jumpstart/build-text-summarization
+
 ### SageMaker Text Generator
 
 [sagemaker_text_generator](sagemaker_text_generator): Enter a prompt. Use a deployed SageMaker JumpStart Inference Endpoint for the Meta Llama 3.2 Instruct model to generate the remainder of the paragraph.
