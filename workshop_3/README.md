@@ -4,8 +4,9 @@
 
 #### Lab: Host OpenAI Whisper Model on SageMaker
 
-Blog post: https://aws.amazon.com/blogs/machine-learning/host-the-whisper-model-on-amazon-sagemaker-exploring-inference-options/  
-GitHub repo: https://github.com/aws-samples/amazon-sagemaker-host-and-inference-whisper-model 
+Blog post: https://aws.amazon.com/blogs/machine-learning/host-the-whisper-model-on-amazon-sagemaker-exploring-inference-options/
+
+GitHub repo: https://github.com/aws-samples/amazon-sagemaker-host-and-inference-whisper-model
 
 #### Lab: Text Summarization with Open Llama 7B V2
 
