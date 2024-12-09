@@ -1,0 +1,12 @@
+faiss-cpu
+transformers
+Pillow
+pypdf
+jq
+anthropic
+chroma-hnswlib==0.7.5
+chromadb==0.5.4
+streamlit
+botocore
+boto3
+awscli
