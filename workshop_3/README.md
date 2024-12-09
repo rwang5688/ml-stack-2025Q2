@@ -21,8 +21,8 @@ Notebook: https://github.com/aws-samples/amazon-sagemaker-immersion-day/blob/mas
 
 Please see [sagemaker_text_generator/README.md](sagemaker_text_generator/README.md) for deployment and text instructions.
 
-#### Bedrock Document Summarizer
+#### Building with Amazon Bedrock: Retrieval Augmented Generation (RAG) Chatbot and Document Summarization
 
-[bedrock_document_summarizer](bedrock_document_summarizer): Upload a PDF document. Use a deployed SageMaker Inference Endpoint for the SageMaker JumpStart model (i.e., Open Llama 7B v2) and LangChain to generate a summarization of the uploaded document.
+Workshop: https://catalog.workshops.aws/building-with-amazon-bedrock/en-US
 
-Please see [bedrock_document_summarizer/README.md](bedrock_document_summarizer/README.md) for deployment and text instructions.
+See [building_with_amazon_bedrock/README.md](building_with_amazon_bedrock/README.md) for deployment and test instructions.
