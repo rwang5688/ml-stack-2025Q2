@@ -1,4 +1,4 @@
-## AWS Workshop 2 - SageMaker JupyterLab App and Model Training
+## AWS Workshop 2 - SageMaker AI JupyterLab App and Model Training
 
 ### SageMaker Immersion Day: Prerequisites: Self-Paced Lab Setup
 
