@@ -50,7 +50,7 @@ def chat(messages):
     response = sagemaker.invoke_endpoint(
         EndpointName=endpoint_name,
         ContentType=content_type,
-        Body=json.dumps(data)
+        Body=json.dumps(data).encode('utf-8')
     )
     print(response)
 
