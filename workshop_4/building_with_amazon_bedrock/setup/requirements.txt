@@ -4,8 +4,10 @@ Pillow
 pypdf
 jq
 anthropic
-chroma-hnswlib==0.7.5
-chromadb==0.5.4
+#chroma-hnswlib==0.7.5
+chroma-hnswlib
+#chromadb==0.5.4
+chromadb
 streamlit
 botocore
 boto3

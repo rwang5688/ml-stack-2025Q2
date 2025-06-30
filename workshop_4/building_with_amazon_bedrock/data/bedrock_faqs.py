@@ -21,7 +21,7 @@ Amazon Bedrock customers can choose from some of the most cutting-edge FMs avail
     Meta: Llama 3 8B, Llama 3 70B
     Mistral AI: Mistral 8X7B Instruct, Mistral 7B Instruct, Mistral Large, Mistral Small
     Stability AI: Stable Diffusion XL 1.0
-    Amazon Titan: Amazon Titan Text Premier, Amazon Titan Text Express, Amazon Titan Text Lite, Amazon Titan Text Embeddings, Amazon Titan Text Embeddings V2, Amazon Titan Multimodal Embeddings, Amazon Titan Image Generator
+    Amazon Titan: Amazon Titan Text Premier, Amazon Titan Text Express, Amazon Titan Text Lite, Amazon Titan Text Embeddings, Amazon Titan Text Embeddings V2, Amazon Titan Multimodal Embeddings, Amazon Nova Canvas
 
 
 """

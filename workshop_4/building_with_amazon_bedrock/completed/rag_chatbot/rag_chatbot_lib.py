@@ -130,11 +130,7 @@ def process_tool(response_message, messages, bedrock, tool_list):
         messages.append(follow_up_message)
         
         response = bedrock.converse(
-            #modelId="amazon.nova-pro-v1:0",
-            #modelId="anthropic.claude-3-sonnet-20240229-v1:0",
-            #modelId="anthropic.claude-3-5-sonnet-20241022-v2:0",
-            modelId="anthropic.claude-3-5-haiku-20241022-v1:0",
-            #modelId="meta.llama3-2-3b-instruct-v1:0",
+            modelId="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
             messages=messages,
             inferenceConfig={
                 "maxTokens": 2000,
@@ -172,11 +168,7 @@ def chat_with_model(message_history, new_text=None):
     messages = convert_chat_messages_to_converse_api(message_history)
     
     response = bedrock.converse(
-        #modelId="amazon.nova-pro-v1:0",
-        #modelId="anthropic.claude-3-sonnet-20240229-v1:0",
-        #modelId="anthropic.claude-3-5-sonnet-20241022-v2:0",
-        modelId="anthropic.claude-3-5-haiku-20241022-v1:0",
-        #modelId="meta.llama3-2-3b-instruct-v1:0",
+        modelId="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
         messages=messages,
         inferenceConfig={
             "maxTokens": 2000,
