@@ -1,5 +1,6 @@
 boto3
 mcp[cli]
+mypy-boto3-sagemaker-runtime
 nova-act
 opensearch-py
 pandas
