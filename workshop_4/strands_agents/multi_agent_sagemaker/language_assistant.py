@@ -1,6 +1,6 @@
 from strands import Agent, tool
 from windows_tools import http_request
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 import json
 
 LANGUAGE_ASSISTANT_SYSTEM_PROMPT = """
@@ -46,8 +46,7 @@ def language_assistant(query: str) -> str:
     try:
         print("Routed to Language Assistant (SageMaker)")
         # Create the language agent with SageMaker integration and HTTP tools
-        agent_factory = get_agent_factory()
-        language_agent = agent_factory.create_agent(
+        language_agent = create_simple_agent(
             system_prompt=LANGUAGE_ASSISTANT_SYSTEM_PROMPT,
             tools=[http_request],
         )

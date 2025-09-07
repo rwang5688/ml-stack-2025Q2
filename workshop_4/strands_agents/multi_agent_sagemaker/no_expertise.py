@@ -1,5 +1,5 @@
 from strands import Agent, tool
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 import json
 
 GENERAL_ASSISTANT_SYSTEM_PROMPT = """
@@ -48,8 +48,7 @@ def general_assistant(query: str) -> str:
     try:
         print("Routed to General Assistant (SageMaker)")
         # Create the general agent with SageMaker integration (no specialized tools)
-        agent_factory = get_agent_factory()
-        general_agent = agent_factory.create_agent(
+        general_agent = create_simple_agent(
             system_prompt=GENERAL_ASSISTANT_SYSTEM_PROMPT,
             tools=[],  # No specialized tools needed for general knowledge
         )

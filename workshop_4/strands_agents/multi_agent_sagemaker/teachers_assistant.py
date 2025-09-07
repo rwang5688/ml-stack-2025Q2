@@ -10,7 +10,7 @@ A specialized Strands agent that is the orchestrator to utilize sub-agents and t
 
 from strands import Agent
 from strands_tools import file_read, file_write, editor
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 from english_assistant import english_assistant
 from language_assistant import language_assistant
 from math_assistant import math_assistant
@@ -47,10 +47,8 @@ Always confirm your understanding before routing to ensure accurate assistance.
 """
 
 # Create the teacher agent with SageMaker integration and specialized assistant tools
-agent_factory = get_agent_factory()
-teacher_agent = agent_factory.create_agent(
+teacher_agent = create_simple_agent(
     system_prompt=TEACHER_SYSTEM_PROMPT,
-    callback_handler=None,
     tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
 )
 

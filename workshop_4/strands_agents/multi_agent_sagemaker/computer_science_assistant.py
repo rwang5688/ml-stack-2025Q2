@@ -1,6 +1,6 @@
 from strands import Agent, tool
 from windows_tools import python_repl, shell, file_read, file_write, editor
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 import json
 
 COMPUTER_SCIENCE_ASSISTANT_SYSTEM_PROMPT = """
@@ -51,8 +51,7 @@ def computer_science_assistant(query: str) -> str:
     try:
         print("Routed to Computer Science Assistant (SageMaker)")
         # Create the computer science agent with SageMaker integration and development tools
-        agent_factory = get_agent_factory()
-        cs_agent = agent_factory.create_agent(
+        cs_agent = create_simple_agent(
             system_prompt=COMPUTER_SCIENCE_ASSISTANT_SYSTEM_PROMPT,
             tools=[python_repl, shell, file_read, file_write, editor],
         )

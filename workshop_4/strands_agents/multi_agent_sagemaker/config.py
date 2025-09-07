@@ -17,3 +17,22 @@ def get_sagemaker_endpoint():
 def get_aws_region():
     """Get AWS region from environment variable."""
     return os.getenv('AWS_DEFAULT_REGION', 'us-west-2')
+
+
+def get_configuration():
+    """Get complete configuration for backward compatibility."""
+    endpoint = get_sagemaker_endpoint()
+    region = get_aws_region()
+    
+    # Simple config object for compatibility
+    class Config:
+        def __init__(self):
+            self.endpoint_name = endpoint
+            self.region = region
+            self.verbose_logging = os.getenv('SAGEMAKER_VERBOSE_LOGGING', 'false').lower() == 'true'
+    
+    class AWSConfig:
+        def __init__(self):
+            self.region = region
+    
+    return Config(), AWSConfig()

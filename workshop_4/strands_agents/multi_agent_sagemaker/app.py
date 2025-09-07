@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from strands import Agent
-    from agent_factory import get_agent_factory
+    from sagemaker_model import create_simple_agent
     from english_assistant import english_assistant
     from language_assistant import language_assistant
     from math_assistant import math_assistant
@@ -46,10 +46,8 @@ try:
     """
 
     # Create the teacher agent with SageMaker integration
-    agent_factory = get_agent_factory()
-    teacher_agent = agent_factory.create_agent(
+    teacher_agent = create_simple_agent(
         system_prompt=TEACHER_SYSTEM_PROMPT,
-        callback_handler=None,
         tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
     )
     
@@ -119,11 +117,12 @@ st.sidebar.write("🧠 **General Topics**: Any other questions you might have")
 # Configuration status
 st.sidebar.header("SageMaker Configuration")
 try:
-    from config import get_configuration
-    config, aws_config = get_configuration()
+    from config import get_sagemaker_endpoint, get_aws_region
+    endpoint = get_sagemaker_endpoint()
+    region = get_aws_region()
     st.sidebar.success("✅ SageMaker Connected")
-    st.sidebar.write(f"**Endpoint**: {config.endpoint_name}")
-    st.sidebar.write(f"**Region**: {config.region}")
+    st.sidebar.write(f"**Endpoint**: {endpoint}")
+    st.sidebar.write(f"**Region**: {region}")
 except Exception as e:
     st.sidebar.error("❌ SageMaker Configuration Error")
     st.sidebar.write("Run `python setup_env.py` first")
