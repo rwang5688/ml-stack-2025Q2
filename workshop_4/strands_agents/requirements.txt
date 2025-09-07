@@ -1,0 +1,11 @@
+boto3
+mcp[cli]
+nova-act
+opensearch-py
+pandas
+retrying
+strands-agents 
+strands-agents-tools[mem0_memory]
+streamlit
+tqdm
+uv
