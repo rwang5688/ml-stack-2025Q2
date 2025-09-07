@@ -28,7 +28,14 @@ def test_sagemaker_model():
         print("✅ Agent created with SageMaker model")
         
         print("\n3. Testing agent response...")
-        response = agent.chat("What is 2 + 2?")
+        # Try different method names for Strands Agent
+        try:
+            response = agent.chat("What is 2 + 2?")
+        except AttributeError:
+            try:
+                response = agent.run("What is 2 + 2?")
+            except AttributeError:
+                response = agent("What is 2 + 2?")
         print(f"✅ Response: {response}")
         
         print("\n🎉 All tests passed!")
