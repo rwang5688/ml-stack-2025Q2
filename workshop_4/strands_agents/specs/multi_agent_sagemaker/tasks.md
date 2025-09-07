@@ -29,6 +29,7 @@
 
 
 
+
 - [-] 2.2 Create basic SageMaker model provider
 
 
@@ -52,6 +53,7 @@
 - [ ] 3. Implement basic error handling and logging
 - [ ] 3.1 Create simple error handling
   - Add basic try-catch blocks around SageMaker API calls
+
   - Implement simple error messages for common scenarios (endpoint not found, auth failure)
   - Add basic timeout handling
   - Include comments for advanced features (retry logic, exponential backoff)
@@ -65,10 +67,12 @@
 
 
 
+
   - Add configuration flag to enable/disable verbose logging
   - Note: SageMaker Inference Endpoints automatically log to CloudWatch (no client-side config needed)
   - Include comments for advanced monitoring (structured logging, custom metrics)
   - _Requirements: 5.1, 5.5_
+
 
 
 
@@ -78,6 +82,7 @@
   - Use single endpoint configuration for all agents in basic demo
 
 
+
   - Add agent creation with basic configuration
   - Include comments for advanced features (specialized endpoints, endpoint routing)
   - _Requirements: 2.1, 2.2, 3.1_
@@ -85,11 +90,14 @@
 - [x] 4.2 Update Math Assistant for SageMaker integration
 
 
+
   - Modify math_assistant.py to use SageMakerAgentFactory
   - Update agent creation to use SageMaker model provider
   - Maintain existing calculator tool integration
 
   - Write integration tests for Math Assistant with SageMaker
+
+
   - _Requirements: 4.1, 2.1, 2.2_
 
 

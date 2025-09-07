@@ -1,6 +1,6 @@
 from strands import Agent, tool
 from windows_tools import calculator
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 import json
 
 MATH_ASSISTANT_SYSTEM_PROMPT = """
@@ -45,8 +45,7 @@ def math_assistant(query: str) -> str:
     try:
         print("Routed to Math Assistant (SageMaker)")
         # Create the math agent with SageMaker integration and calculator capability
-        agent_factory = get_agent_factory()
-        math_agent = agent_factory.create_agent(
+        math_agent = create_simple_agent(
             system_prompt=MATH_ASSISTANT_SYSTEM_PROMPT,
             tools=[calculator],
         )

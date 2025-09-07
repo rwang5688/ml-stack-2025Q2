@@ -16,7 +16,7 @@ import sys
 def setup_environment():
     """Set up environment variables for SageMaker integration."""
     # Required SageMaker configuration
-    os.environ['SAGEMAKER_ENDPOINT_NAME'] = 'jumpstart-dft-hf-llm-openlm-researc-20250907-051801'
+    os.environ['SAGEMAKER_ENDPOINT_NAME'] = 'jumpstart-dft-hf-llm-mistral-small-20250907-093555'
     os.environ['SAGEMAKER_REGION'] = 'us-west-2'
     
     # Optional configuration for testing

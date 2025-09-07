@@ -1,6 +1,6 @@
 from strands import Agent, tool
 from windows_tools import file_read, file_write, editor
-from agent_factory import get_agent_factory
+from sagemaker_model import create_simple_agent
 import json
 
 ENGLISH_ASSISTANT_SYSTEM_PROMPT = """
@@ -47,8 +47,7 @@ def english_assistant(query: str) -> str:
         print("Routed to English Assistant (SageMaker)")
 
         # Create the English agent with SageMaker integration and file tools
-        agent_factory = get_agent_factory()
-        english_agent = agent_factory.create_agent(
+        english_agent = create_simple_agent(
             system_prompt=ENGLISH_ASSISTANT_SYSTEM_PROMPT,
             tools=[editor, file_read, file_write],
         )
