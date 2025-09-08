@@ -10,7 +10,7 @@ import os
 import sys
 # Add the multi_agent_sagemaker directory to the path to import config
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'multi_agent_sagemaker'))
-from config import get_configuration, SageMakerConfig, AWSConfig
+from config import get_configuration
 
 
 def test_configuration():
@@ -24,8 +24,6 @@ def test_configuration():
         print("✅ Configuration loaded successfully!")
         print(f"   Endpoint: {config.endpoint_name}")
         print(f"   Region: {config.region}")
-        print(f"   Timeout: {config.timeout}s")
-        print(f"   Max Retries: {config.max_retries}")
         print(f"   Verbose Logging: {config.verbose_logging}")
         
         # Show authentication method
