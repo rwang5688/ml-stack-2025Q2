@@ -56,7 +56,7 @@ The system requires these environment variables:
 ## Current Configuration
 
 The `setup_env.py` script is pre-configured with:
-- **Endpoint**: `jumpstart-dft-hf-llm-openlm-researc-20250907-051801`
+- **Endpoint**: `jumpstart-dft-hf-llm-mistral-small-20250908-025809`
 - **Region**: `us-west-2`
 - **Execution Role**: `arn:aws:iam::442042509097:role/service-role/AmazonSageMaker-ExecutionRole-20250606T132304`
 
@@ -81,7 +81,7 @@ If you encounter configuration errors:
 3. Confirm your AWS credentials have SageMaker permissions
 
 ### SageMaker Endpoint Issues
-- Ensure the endpoint `jumpstart-dft-hf-llm-openlm-researc-20250907-051801` is deployed and in service
+- Ensure the endpoint `jumpstart-dft-hf-llm-mistral-small-20250908-025809` is deployed and in service
 - Check that your execution role has the necessary SageMaker permissions
 - Verify the endpoint is in the `us-west-2` region
 

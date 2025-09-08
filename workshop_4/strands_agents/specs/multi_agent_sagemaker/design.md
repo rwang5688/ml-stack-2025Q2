@@ -2,9 +2,9 @@
 
 ## Overview
 
-The multi_agent_sagemaker system will be created by copying the existing multi_agent_example and integrating Amazon SageMaker Inference Endpoints for all model inference calls. The system maintains the same multi-agent architecture with a central orchestrator (Teacher's Assistant) coordinating specialized agents, but routes all LLM requests through SageMaker endpoints instead of the default Strands model configuration.
+The multi_agent_sagemaker system has been implemented as a multi-agent educational assistant that uses Amazon SageMaker Inference Endpoints for all model inference calls. The system features a central orchestrator (Teacher's Assistant) that coordinates five specialized agents, routing all LLM requests through SageMaker endpoints using the native Strands SDK SageMaker support.
 
-This design enables enterprise-grade deployment with improved scalability, monitoring, and cost management while preserving the existing user experience and functionality.
+This implementation provides enterprise-grade deployment with improved scalability, monitoring, and cost management while maintaining an intuitive Streamlit-based user interface for educational interactions.
 
 ## Architecture
 
@@ -69,267 +69,256 @@ The integration will be implemented through a custom model provider that wraps S
 
 ## Components and Interfaces
 
-### 1. SageMaker Model Provider
+### 1. SageMaker Model Integration
 
-**Purpose**: Custom model provider that integrates with Strands Agent framework to route inference requests to SageMaker endpoints.
+**Purpose**: Uses the native Strands SDK SageMaker support to integrate with Amazon SageMaker Inference Endpoints.
 
-**Key Methods**:
-- `__init__(endpoint_name, region, credentials)`: Initialize with SageMaker configuration
-- `generate(prompt, **kwargs)`: Send inference request to SageMaker endpoint
-- `_prepare_payload(prompt, **kwargs)`: Format request payload for SageMaker
-- `_parse_response(response)`: Parse SageMaker response to Strands format
+**Documentation Reference**: For complete details on Strands SageMaker integration, see the [official documentation](https://strandsagents.com/latest/documentation/docs/user-guide/concepts/model-providers/sagemaker/).
 
-**Interface**:
+**Implementation**: The system uses `SageMakerAIModel` from `strands.models.sagemaker` with the following configuration:
+
 ```python
-class SageMakerModelProvider:
-    def __init__(self, endpoint_name: str, region: str = None, credentials: dict = None):
-        """Initialize SageMaker model provider"""
-        
-    def generate(self, prompt: str, **kwargs) -> str:
-        """Generate response using SageMaker endpoint"""
-        
-    def _prepare_payload(self, prompt: str, **kwargs) -> dict:
-        """Prepare request payload for SageMaker endpoint"""
-        
-    def _parse_response(self, response: dict) -> str:
-        """Parse SageMaker response to text format"""
-```
-
-### 2. Configuration Manager
-
-**Purpose**: Manage SageMaker endpoint configurations, AWS credentials, and environment-specific settings.
-
-**Note**: SageMaker Inference Endpoints automatically log all requests and responses to Amazon CloudWatch. This includes model invocation logs, endpoint metrics, and error logs. No additional client-side configuration is required for CloudWatch logging.
-
-**Configuration Sources**:
-- Environment variables (primary)
-- Configuration files (secondary)
-- Runtime parameters (override)
-
-**Configuration Schema**:
-```python
-{
-    "sagemaker": {
-        "region": "us-west-2",
-        "endpoints": {
-            "default": "my-llm-endpoint",
-            "math": "my-math-specialized-endpoint",  # Optional specialized endpoints
-            "language": "my-translation-endpoint"
+def create_sagemaker_model():
+    """Create a SageMaker AI model using native Strands support."""
+    endpoint_name = get_sagemaker_endpoint()
+    region = get_aws_region()
+    
+    sagemaker_model = SageMakerAIModel(
+        endpoint_config={
+            "endpoint_name": endpoint_name,
+            "region_name": region,
         },
-        "timeout": 30,
-        "max_retries": 3
-    },
-    "aws": {
-        "access_key_id": "...",  # Optional, can use IAM roles
-        "secret_access_key": "...",
-        "session_token": "..."  # For temporary credentials
-    }
-}
+        payload_config={
+            "max_tokens": 1000,
+            "temperature": 0.7,
+            "stream": True,
+        }
+    )
+    return sagemaker_model
+
+def create_simple_agent(system_prompt: str, tools=None):
+    """Create a Strands agent with SageMaker model."""
+    sagemaker_model = create_sagemaker_model()
+    agent = Agent(
+        system_prompt=system_prompt,
+        model=sagemaker_model,
+        tools=tools or []
+    )
+    return agent
 ```
 
-### 3. Agent Factory
+**Model Compatibility**: The system is designed to work with models that support OpenAI-compatible chat completion APIs. It has been validated with Mistral-Small-24B-Instruct-2501, which provides reliable performance and tool calling capabilities. For detailed model compatibility requirements, refer to the [Strands SageMaker documentation](https://strandsagents.com/latest/documentation/docs/user-guide/concepts/model-providers/sagemaker/).
 
-**Purpose**: Factory pattern to create agents with SageMaker-enabled model providers.
+### 2. Configuration Management
 
-**Interface**:
+**Purpose**: Simple configuration system that manages SageMaker endpoint settings through environment variables.
+
+**Implementation**: The `config.py` module provides straightforward configuration management:
+
 ```python
-class SageMakerAgentFactory:
-    def __init__(self, config_manager: ConfigManager):
-        """Initialize with configuration manager"""
-        
-    def create_agent(self, system_prompt: str, tools: list = None, 
-                    endpoint_override: str = None) -> Agent:
-        """Create agent with SageMaker model provider"""
+def get_sagemaker_endpoint():
+    """Get SageMaker endpoint name from environment variable."""
+    endpoint_name = os.getenv('SAGEMAKER_ENDPOINT_NAME')
+    if not endpoint_name:
+        raise ValueError("SAGEMAKER_ENDPOINT_NAME environment variable is required")
+    return endpoint_name
+
+def get_aws_region():
+    """Get AWS region from environment variable."""
+    return os.getenv('AWS_DEFAULT_REGION', 'us-west-2')
 ```
 
-### 4. Specialized Agents (Modified)
+**Configuration Variables**:
+- `SAGEMAKER_ENDPOINT_NAME` (required): SageMaker inference endpoint name
+- `SAGEMAKER_REGION` (optional): AWS region, defaults to us-west-2
+- `SAGEMAKER_VERBOSE_LOGGING` (optional): Enable detailed logging
+- `SAGEMAKER_TIMEOUT` (optional): Request timeout in seconds
+- `SAGEMAKER_MAX_RETRIES` (optional): Maximum retry attempts
 
-Each specialized agent will be updated to use the SageMaker model provider:
+**Current Configuration**: The system is pre-configured with:
+- Endpoint: `jumpstart-dft-hf-llm-mistral-small-20250908-025809`
+- Region: `us-west-2`
+- Authentication: Uses default AWS credential chain
 
-- **Math Assistant**: Uses SageMaker endpoint for mathematical reasoning
-- **English Assistant**: Uses SageMaker endpoint for language and writing tasks
-- **Language Assistant**: Uses SageMaker endpoint for translation tasks
-- **Computer Science Assistant**: Uses SageMaker endpoint for programming assistance
-- **General Assistant**: Uses SageMaker endpoint for general queries
+### 3. Agent Creation Pattern
 
-**Modified Agent Pattern**:
+**Purpose**: Simplified agent creation using the `create_simple_agent` function that integrates SageMaker models with Strands agents.
+
+**Implementation**: Each specialized agent uses this pattern:
+```python
+def create_simple_agent(system_prompt: str, tools=None):
+    """Create a Strands agent with SageMaker model."""
+    sagemaker_model = create_sagemaker_model()
+    agent = Agent(
+        system_prompt=system_prompt,
+        model=sagemaker_model,
+        tools=tools or []
+    )
+    return agent
+```
+
+### 4. Specialized Agents
+
+The system implements five specialized agents, each using SageMaker endpoints for model inference:
+
+- **Math Assistant** (`math_assistant.py`): Handles mathematical calculations with calculator tool integration
+- **English Assistant** (`english_assistant.py`): Processes grammar and writing tasks with file editing tools
+- **Language Assistant** (`language_assistant.py`): Manages translations with HTTP request capabilities
+- **Computer Science Assistant** (`computer_science_assistant.py`): Handles programming questions with Python REPL and shell tools
+- **General Assistant** (`no_expertise.py`): Processes general queries with no specialized tools
+
+**Agent Implementation Pattern**:
 ```python
 @tool
 def math_assistant(query: str) -> str:
     """Process math queries using SageMaker-enabled agent"""
+    formatted_query = f"Please solve the following mathematical problem, showing all steps and explaining concepts clearly: {query}"
+    
     try:
         print("Routed to Math Assistant (SageMaker)")
-        
-        # Create agent with SageMaker model provider
-        math_agent = agent_factory.create_agent(
+        math_agent = create_simple_agent(
             system_prompt=MATH_ASSISTANT_SYSTEM_PROMPT,
             tools=[calculator],
-            endpoint_override="math"  # Optional specialized endpoint
         )
-        
-        response = math_agent(formatted_query)
-        return str(response)
+        agent_response = math_agent(formatted_query)
+        return str(agent_response)
         
     except Exception as e:
-        return f"Error processing mathematical query via SageMaker: {str(e)}"
+        return f"Error processing your mathematical query via SageMaker: {str(e)}"
 ```
 
 ## Data Models
 
-### 1. SageMaker Request/Response Models
+### 1. SageMaker Integration
 
-**Request Payload**:
+**Model Configuration**: The system uses the native Strands `SageMakerAIModel` which handles request/response formatting automatically. For implementation details and configuration options, see the [Strands SageMaker documentation](https://strandsagents.com/latest/documentation/docs/user-guide/concepts/model-providers/sagemaker/):
+
 ```python
-{
-    "inputs": "user prompt text",
-    "parameters": {
-        "max_new_tokens": 512,
+sagemaker_model = SageMakerAIModel(
+    endpoint_config={
+        "endpoint_name": endpoint_name,
+        "region_name": region,
+    },
+    payload_config={
+        "max_tokens": 1000,
         "temperature": 0.7,
-        "top_p": 0.9,
-        "do_sample": True
+        "stream": True,
     }
-}
+)
 ```
 
-**Response Format**:
-```python
-{
-    "generated_text": "model response text",
-    "metadata": {
-        "finish_reason": "stop",
-        "tokens_used": 150
-    }
-}
-```
+### 2. Configuration Structure
 
-### 2. Configuration Models
+**Simple Configuration**: The system uses a lightweight configuration approach:
 
-**SageMaker Configuration**:
 ```python
-@dataclass
-class SageMakerConfig:
-    region: str
-    default_endpoint: str
-    specialized_endpoints: Dict[str, str]
-    timeout: int = 30
-    max_retries: int = 3
-    
-@dataclass 
-class AWSCredentials:
-    access_key_id: Optional[str] = None
-    secret_access_key: Optional[str] = None
-    session_token: Optional[str] = None
-    region: Optional[str] = None
+class Config:
+    def __init__(self):
+        self.endpoint_name = endpoint
+        self.region = region
+        self.verbose_logging = os.getenv('SAGEMAKER_VERBOSE_LOGGING', 'false').lower() == 'true'
+
+class AWSConfig:
+    def __init__(self):
+        self.region = region
 ```
 
 ## Error Handling
 
-### 1. SageMaker-Specific Errors
+### 1. Application-Level Error Handling
 
-**Endpoint Not Found**:
-- Error Detection: HTTP 404 or specific SageMaker error codes
-- Response: Clear message with endpoint name and suggested troubleshooting
-- Fallback: None (fail fast with informative error)
-
-**Authentication Errors**:
-- Error Detection: HTTP 403 or AWS credential errors
-- Response: Guide user to check AWS credentials and permissions
-- Fallback: None (security-sensitive, fail fast)
-
-**Rate Limiting**:
-- Error Detection: HTTP 429 or throttling errors
-- Response: Implement exponential backoff retry logic
-- Fallback: Inform user of temporary unavailability
-
-**Timeout Errors**:
-- Error Detection: Request timeout or connection errors
-- Response: Retry with exponential backoff (up to max_retries)
-- Fallback: Inform user of endpoint unavailability
-
-### 2. Error Handling Strategy
+The system implements error handling at the agent level with informative error messages:
 
 ```python
-class SageMakerErrorHandler:
-    def handle_error(self, error: Exception, context: dict) -> str:
-        """Handle SageMaker-specific errors with appropriate responses"""
-        
-    def should_retry(self, error: Exception) -> bool:
-        """Determine if error is retryable"""
-        
-    def get_retry_delay(self, attempt: int) -> float:
-        """Calculate exponential backoff delay"""
+try:
+    print("Routed to Math Assistant (SageMaker)")
+    math_agent = create_simple_agent(
+        system_prompt=MATH_ASSISTANT_SYSTEM_PROMPT,
+        tools=[calculator],
+    )
+    agent_response = math_agent(formatted_query)
+    text_response = str(agent_response)
+
+    if len(text_response) > 0:
+        return text_response
+
+    return "I apologize, but I couldn't solve this mathematical problem. Please check if your query is clearly stated or try rephrasing it."
+except Exception as e:
+    return f"Error processing your mathematical query via SageMaker: {str(e)}"
+```
+
+### 2. Configuration Error Handling
+
+The configuration system provides clear error messages for missing or invalid settings:
+
+```python
+def get_sagemaker_endpoint():
+    """Get SageMaker endpoint name from environment variable."""
+    endpoint_name = os.getenv('SAGEMAKER_ENDPOINT_NAME')
+    if not endpoint_name:
+        raise ValueError("SAGEMAKER_ENDPOINT_NAME environment variable is required")
+    return endpoint_name
+```
+
+### 3. Streamlit Application Error Handling
+
+The main application gracefully handles import and runtime errors:
+
+```python
+try:
+    from strands import Agent
+    from sagemaker_model import create_simple_agent
+    # ... other imports
+    AGENTS_AVAILABLE = True
+except ImportError as e:
+    st.error(f"Could not import required modules: {e}")
+    AGENTS_AVAILABLE = False
 ```
 
 ## Testing Strategy
 
-### 1. Unit Testing
+### 1. Configuration Testing
 
-**SageMaker Model Provider Tests**:
-- Mock SageMaker responses for different scenarios
-- Test payload formatting and response parsing
-- Test error handling for various failure modes
-- Test credential handling and authentication
+**Configuration Validation** (`test_config.py`):
+- Validates environment variable setup
+- Tests configuration loading and error handling
+- Provides clear feedback for setup issues
+- Shows environment status for troubleshooting
 
-**Configuration Manager Tests**:
-- Test configuration loading from different sources
-- Test environment variable parsing
-- Test configuration validation
-- Test credential management
+### 2. Model Integration Testing
 
-**Agent Factory Tests**:
-- Test agent creation with different configurations
-- Test endpoint override functionality
-- Test error propagation
+**SageMaker Model Testing** (`test_sagemaker_model.py`):
+- Tests SageMaker model creation using native Strands support
+- Validates agent creation with SageMaker integration
+- Tests basic agent response functionality
+- Handles different agent invocation methods
 
-### 2. Integration Testing
+### 3. Agent-Specific Testing
 
-**SageMaker Endpoint Integration**:
-- Test actual SageMaker endpoint connectivity
-- Test authentication with real AWS credentials
-- Test different endpoint configurations
-- Test error scenarios with real endpoints
+**Individual Agent Tests**:
+- `test_math_assistant.py`: Tests mathematical query processing
+- `test_all_assistants.py`: Comprehensive testing of all specialized agents
+- `test_error_handling.py`: Tests error scenarios and graceful degradation
 
-**End-to-End Agent Testing**:
-- Test each specialized agent with SageMaker integration
-- Test orchestrator routing with SageMaker agents
-- Test Streamlit interface with SageMaker backend
-- Test concurrent request handling
+### 4. Environment Setup and Validation
 
-### 3. Performance Testing
+**Setup Testing** (`setup_env.py`):
+- Automated environment variable configuration
+- Configuration validation with clear feedback
+- Integration with test suite for validation
+- Support for both test and production configurations
 
-**Load Testing**:
-- Test concurrent requests to SageMaker endpoints
-- Measure response times and throughput
-- Test rate limiting and retry behavior
-- Test resource utilization
+### 5. Test Infrastructure
 
-**Credential Testing**:
-- Test with temporary AWS credentials
-- Test credential expiration handling
-- Test credential refresh scenarios
-- Test different authentication methods (IAM roles, access keys)
-
-### 4. Test Configuration
-
-**Test Environment Setup**:
-```python
-# Test configuration for SageMaker integration
-TEST_CONFIG = {
-    "sagemaker": {
-        "region": "us-west-2",
-        "endpoints": {
-            "default": "test-llm-endpoint"
-        },
-        "timeout": 10,
-        "max_retries": 2
-    }
-}
+**Test Directory Structure**:
+```
+tests/multi_agent_sagemaker/
+├── test_config.py              # Configuration validation
+├── test_sagemaker_model.py     # Model integration tests
+├── test_math_assistant.py      # Math agent specific tests
+├── test_all_assistants.py      # All agents comprehensive test
+├── test_error_handling.py      # Error scenario testing
+└── setup_test_env.py          # Test environment setup
 ```
 
-**Mock SageMaker Responses**:
-- Success responses with various content types
-- Error responses for different failure scenarios
-- Rate limiting and timeout scenarios
-- Authentication failure scenarios
-
-The testing strategy ensures comprehensive validation of the SageMaker integration while supporting development with temporary credentials and providing clear feedback for troubleshooting.
+**Windows Compatibility**: The system includes `windows_tools.py` to handle Unix-specific module compatibility issues, ensuring cross-platform functionality.

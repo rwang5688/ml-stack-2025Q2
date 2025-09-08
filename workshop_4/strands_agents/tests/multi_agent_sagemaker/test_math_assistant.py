@@ -42,12 +42,12 @@ def test_math_assistant_creation():
 
 
 def test_math_assistant_integration():
-    """Test that the math assistant properly integrates with SageMaker factory."""
+    """Test that the math assistant properly integrates with SageMaker model creation."""
     print("\n🧪 Testing SageMaker Integration\n")
     
     try:
-        # Test that the assistant uses the SageMaker factory
-        print("Testing SageMaker factory integration...")
+        # Test that the assistant uses the SageMaker model integration
+        print("Testing SageMaker model integration...")
         
         # This should show "Routed to Math Assistant (SageMaker)" message
         result = math_assistant("Solve the quadratic equation x^2 + 5x + 6 = 0")
