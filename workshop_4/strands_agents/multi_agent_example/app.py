@@ -3,11 +3,11 @@ from strands import Agent
 from strands.models import BedrockModel
 
 # Import the specialized assistants
-from strands_multi_agent_example.computer_science_assistant import computer_science_assistant
-from strands_multi_agent_example.english_assistant import english_assistant
-from strands_multi_agent_example.language_assistant import language_assistant
-from strands_multi_agent_example.math_assistant import math_assistant
-from strands_multi_agent_example.no_expertise import general_assistant
+from computer_science_assistant import computer_science_assistant
+from english_assistant import english_assistant
+from language_assistant import language_assistant
+from math_assistant import math_assistant
+from no_expertise import general_assistant
 
 # Define the teacher's assistant system prompt
 TEACHER_SYSTEM_PROMPT = """
