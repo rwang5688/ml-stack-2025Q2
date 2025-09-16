@@ -1,126 +1,104 @@
 import streamlit as st
-import sys
-import os
+from strands import Agent
+from strands.models import BedrockModel
 
-# Set environment variable to skip Python execution prompts to prevent UI hanging
-os.environ["STRANDS_AUTO_APPROVE"] = "true"
+# Import the specialized assistants
+from strands_multi_agent_example.computer_science_assistant import computer_science_assistant
+from strands_multi_agent_example.english_assistant import english_assistant
+from strands_multi_agent_example.language_assistant import language_assistant
+from strands_multi_agent_example.math_assistant import math_assistant
+from strands_multi_agent_example.no_expertise import general_assistant
 
-# Add the current directory to the Python path to import the agents
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Define the teacher's assistant system prompt
+TEACHER_SYSTEM_PROMPT = """
+You are TeachAssist, a sophisticated educational orchestrator designed to coordinate educational support across multiple subjects. Your role is to:
 
-try:
-    from strands import Agent
-    from english_assistant import english_assistant
-    from language_assistant import language_assistant
-    from math_assistant import math_assistant
-    from computer_science_assistant import computer_science_assistant
-    from no_expertise import general_assistant
-    
-    # Define the teacher system prompt
-    TEACHER_SYSTEM_PROMPT = """
-    You are TeachAssist, a sophisticated educational orchestrator designed to coordinate educational support across multiple subjects. Your role is to:
+1. Analyze incoming student queries and determine the most appropriate specialized agent to handle them:
+   - Math Agent: For mathematical calculations, problems, and concepts
+   - English Agent: For writing, grammar, literature, and composition
+   - Language Agent: For translation and language-related queries
+   - Computer Science Agent: For programming, algorithms, data structures, and code execution
+   - General Assistant: For all other topics outside these specialized domains
 
-    1. Analyze incoming student queries and determine the most appropriate specialized agent to handle them:
-       - Math Agent: For mathematical calculations, problems, and concepts
-       - English Agent: For writing, grammar, literature, and composition
-       - Language Agent: For translation and language-related queries
-       - Computer Science Agent: For programming, algorithms, data structures, and code execution
-       - General Assistant: For all other topics outside these specialized domains
+2. Key Responsibilities:
+   - Accurately classify student queries by subject area
+   - Route requests to the appropriate specialized agent
+   - Maintain context and coordinate multi-step problems
+   - Ensure cohesive responses when multiple agents are needed
 
-    2. Key Responsibilities:
-       - Accurately classify student queries by subject area
-       - Route requests to the appropriate specialized agent
-       - Maintain context and coordinate multi-step problems
-       - Ensure cohesive responses when multiple agents are needed
+3. Decision Protocol:
+   - If query involves calculations/numbers → Math Agent
+   - If query involves writing/literature/grammar → English Agent
+   - If query involves translation → Language Agent
+   - If query involves programming/coding/algorithms/computer science → Computer Science Agent
+   - If query is outside these specialized areas → General Assistant
+   - For complex queries, coordinate multiple agents as needed
 
-    3. Decision Protocol:
-       - If query involves calculations/numbers → Math Agent
-       - If query involves writing/literature/grammar → English Agent
-       - If query involves translation → Language Agent
-       - If query involves programming/coding/algorithms/computer science → Computer Science Agent
-       - If query is outside these specialized areas → General Assistant
-       - For complex queries, coordinate multiple agents as needed
+Always confirm your understanding before routing to ensure accurate assistance.
+"""
 
-    Always confirm your understanding before routing to ensure accurate assistance.
-    """
+# Set up the page
+st.set_page_config(page_title="TeachAssist - Educational Assistant", layout="wide")
+st.title("TeachAssist - Educational Assistant")
+st.write("Ask a question in any subject area, and I'll route it to the appropriate specialist.")
 
-    # Create the teacher agent
-    teacher_agent = Agent(
-        system_prompt=TEACHER_SYSTEM_PROMPT,
-        callback_handler=None,
-        tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
-    )
-    
-    AGENTS_AVAILABLE = True
-except ImportError as e:
-    st.error(f"Could not import required modules: {e}")
-    AGENTS_AVAILABLE = False
-
-# Set page config
-st.set_page_config(
-    page_title="Teacher's Assistant Chatbot",
-    page_icon="🎓",
-    layout="wide"
-)
-
-# Main title
-st.title("🎓 Teacher's Assistant Chatbot")
-
-# Welcome message
-st.write("Welcome to your AI-powered educational assistant! Ask questions about math, English, computer science, languages, or any general topic.")
-
-# Initialize chat history
+# Initialize session state for conversation history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat messages from history on app rerun
+# Display conversation history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# React to user input
-if prompt := st.chat_input("Ask me anything about math, English, computer science, languages, or general topics..."):
-    # Display user message in chat message container
-    st.chat_message("user").markdown(prompt)
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
+# Initialize the teacher agent
+@st.cache_resource
+def get_teacher_agent():
+    # Specify the Bedrock ModelID
+    bedrock_model = BedrockModel(
+        model_id="us.amazon.nova-pro-v1:0",
+        temperature=0.3,
+    )
+    
+    # Create the teacher agent with specialized tools
+    return Agent(
+        model=bedrock_model,
+        system_prompt=TEACHER_SYSTEM_PROMPT,
+        callback_handler=None,
+        tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
+    )
 
-    if AGENTS_AVAILABLE:
+# Get user input
+query = st.chat_input("Ask your question here...")
+
+if query:
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": query})
+    
+    # Display user message
+    with st.chat_message("user"):
+        st.markdown(query)
+    
+    # Display assistant response
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        
         try:
-            # Get response from teacher agent
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    response = teacher_agent(prompt)
-                    response_text = str(response)
-                    st.markdown(response_text)
+            # Get the teacher agent
+            teacher_agent = get_teacher_agent()
+            
+            # Process the query
+            with st.spinner("Thinking..."):
+                response = teacher_agent(query)
+                content = str(response)
+            
+            # Display the response
+            message_placeholder.markdown(content)
             
             # Add assistant response to chat history
-            st.session_state.messages.append({"role": "assistant", "content": response_text})
+            st.session_state.messages.append({"role": "assistant", "content": content})
+            
         except Exception as e:
-            error_msg = f"Sorry, I encountered an error: {str(e)}"
-            st.chat_message("assistant").markdown(error_msg)
-            st.session_state.messages.append({"role": "assistant", "content": error_msg})
-    else:
-        fallback_msg = "Sorry, the AI agents are not available. Please check that all required dependencies are installed."
-        st.chat_message("assistant").markdown(fallback_msg)
-        st.session_state.messages.append({"role": "assistant", "content": fallback_msg})
-
-# Sidebar
-st.sidebar.header("About")
-st.sidebar.write("This is an AI-powered educational chatbot that can help with:")
-st.sidebar.write("📊 **Math**: Calculations, algebra, geometry, statistics")
-st.sidebar.write("📝 **English**: Writing, grammar, literature analysis")
-st.sidebar.write("🌍 **Languages**: Translation and language learning")
-st.sidebar.write("💻 **Computer Science**: Programming, algorithms, debugging")
-st.sidebar.write("🧠 **General Topics**: Any other questions you might have")
-
-st.sidebar.header("Features")
-st.sidebar.write("- Multi-agent AI system")
-st.sidebar.write("- Specialized subject experts")
-st.sidebar.write("- Interactive chat interface")
-st.sidebar.write("- Real-time responses")
-
-# Clear chat button
-if st.sidebar.button("Clear Chat History"):
-    st.session_state.messages = []
-    st.rerun()
+            error_message = f"An error occurred: {str(e)}"
+            message_placeholder.markdown(error_message)
+            st.session_state.messages.append({"role": "assistant", "content": error_message})
