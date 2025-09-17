@@ -1,4 +1,5 @@
 from strands import Agent, tool
+from strands.models import BedrockModel
 import json
 
 GENERAL_ASSISTANT_SYSTEM_PROMPT = """
@@ -46,7 +47,12 @@ def general_assistant(query: str) -> str:
     
     try:
         print("Routed to General Assistant")
+        bedrock_model = BedrockModel(
+            model_id="us.amazon.nova-pro-v1:0",
+            temperature=0.3,
+        )
         general_agent = Agent(
+            model=bedrock_model,
             system_prompt=GENERAL_ASSISTANT_SYSTEM_PROMPT,
             tools=[],  # No specialized tools needed for general knowledge
         )

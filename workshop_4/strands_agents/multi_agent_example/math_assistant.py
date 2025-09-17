@@ -1,4 +1,5 @@
 from strands import Agent, tool
+from strands.models import BedrockModel
 from windows_tools import calculator
 import json
 
@@ -44,7 +45,12 @@ def math_assistant(query: str) -> str:
     try:
         print("Routed to Math Assistant")
         # Create the math agent with calculator capability
+        bedrock_model = BedrockModel(
+            model_id="us.amazon.nova-pro-v1:0",
+            temperature=0.3,
+        )
         math_agent = Agent(
+            model=bedrock_model,
             system_prompt=MATH_ASSISTANT_SYSTEM_PROMPT,
             tools=[calculator],
         )

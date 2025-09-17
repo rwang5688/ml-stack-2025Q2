@@ -9,6 +9,7 @@ A specialized Strands agent that is the orchestrator to utilize sub-agents and t
 """
 
 from strands import Agent
+from strands.models import BedrockModel
 from strands_tools import file_read, file_write, editor
 from english_assistant import english_assistant
 from language_assistant import language_assistant
@@ -46,7 +47,13 @@ Always confirm your understanding before routing to ensure accurate assistance.
 """
 
 # Create a file-focused agent with selected tools
+bedrock_model = BedrockModel(
+    model_id="us.amazon.nova-pro-v1:0",
+    temperature=0.3,
+)
+
 teacher_agent = Agent(
+    model=bedrock_model,
     system_prompt=TEACHER_SYSTEM_PROMPT,
     callback_handler=None,
     tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],

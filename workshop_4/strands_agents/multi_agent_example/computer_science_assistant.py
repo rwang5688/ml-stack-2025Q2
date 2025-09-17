@@ -1,4 +1,5 @@
 from strands import Agent, tool
+from strands.models import BedrockModel
 from windows_tools import python_repl, shell, file_read, file_write, editor
 import json
 
@@ -50,7 +51,12 @@ def computer_science_assistant(query: str) -> str:
     try:
         print("Routed to Computer Science Assistant")
         # Create the computer science agent with relevant tools
+        bedrock_model = BedrockModel(
+            model_id="us.amazon.nova-pro-v1:0",
+            temperature=0.3,
+        )
         cs_agent = Agent(
+            model=bedrock_model,
             system_prompt=COMPUTER_SCIENCE_ASSISTANT_SYSTEM_PROMPT,
             tools=[python_repl, shell, file_read, file_write, editor],
         )

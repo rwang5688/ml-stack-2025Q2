@@ -1,4 +1,5 @@
 from strands import Agent, tool
+from strands.models import BedrockModel
 from windows_tools import file_read, file_write, editor
 import json
 
@@ -44,8 +45,13 @@ def english_assistant(query: str) -> str:
     
     try:
         print("Routed to English Assistant")
-
+        
+        bedrock_model = BedrockModel(
+            model_id="us.amazon.nova-pro-v1:0",
+            temperature=0.3,
+        )
         english_agent = Agent(
+            model=bedrock_model,
             system_prompt=ENGLISH_ASSISTANT_SYSTEM_PROMPT,
             tools=[editor, file_read, file_write],
         )
