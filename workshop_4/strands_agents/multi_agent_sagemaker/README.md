@@ -103,9 +103,22 @@ export SAGEMAKER_VERBOSE_LOGGING=true
 
 ## Quick Start
 
-### 1. Run the Streamlit App
+### 1. Configure Your SageMaker Endpoint
 
-**Important**: You must run the environment setup before using the system.
+**Important**: You must update the endpoint name before running the system.
+
+1. Edit `setup_env.py` and replace the endpoint template:
+   ```python
+   # Change this line:
+   endpoint_name = 'jumpstart-dft-hf-llm-mistral-small-{YYYYMMDD}-{HHMMSS}'
+   
+   # To your actual endpoint name, for example:
+   endpoint_name = 'jumpstart-dft-hf-llm-mistral-small-20250908-025809'
+   ```
+
+2. Also update `tests/multi_agent_sagemaker/setup_test_env.py` with the same endpoint name.
+
+### 2. Run the Streamlit App
 
 ```bash
 # Navigate to the multi_agent_sagemaker directory
@@ -126,7 +139,7 @@ After successful environment setup:
 streamlit run app.py
 ```
 
-### 2. Alternative: Test Individual Components
+### 3. Alternative: Test Individual Components
 
 You can test individual agents directly:
 
@@ -144,7 +157,6 @@ The system requires these environment variables:
 
 ### Required
 - `SAGEMAKER_ENDPOINT_NAME`: Your SageMaker inference endpoint name
-- `SAGEMAKER_EXECUTION_ROLE_ARN`: SageMaker execution role ARN
 
 ### Optional
 - `SAGEMAKER_REGION`: AWS region (default: us-west-2)
@@ -157,9 +169,8 @@ The system requires these environment variables:
 The system uses environment variables for configuration. Use the `setup_env.py` script for easy setup, or set variables manually as shown in the configuration section above.
 
 The `setup_env.py` script is pre-configured with:
-- **Endpoint**: `jumpstart-dft-hf-llm-mistral-small-20250908-025809`
+- **Endpoint**: `jumpstart-dft-hf-llm-mistral-small-{YYYYMMDD}-{HHMMSS}` (replace with your actual endpoint)
 - **Region**: `us-west-2`
-- **Execution Role**: `arn:aws:iam::{YOUR_AWS_ACCOUNT_ID}:role/service-role/AmazonSageMaker-ExecutionRole-20250606T132304`
 
 ## Architecture
 
@@ -240,8 +251,8 @@ python setup_env.py
 ```
 
 ### SageMaker Endpoint Issues
-- Ensure the endpoint `jumpstart-dft-hf-llm-mistral-small-20250908-025809` is deployed and in service
-- Check that your execution role has the necessary SageMaker permissions
+- Ensure your endpoint is deployed and in service
+- Check that your AWS credentials have the necessary SageMaker permissions
 - Verify the endpoint is in the `us-west-2` region
 
 ### Streamlit Issues
@@ -260,7 +271,7 @@ python setup_env.py
 
 For reference, here's a working configuration:
 ```bash
-export SAGEMAKER_ENDPOINT_NAME=jumpstart-dft-hf-llm-mistral-small-20250908-025809
+export SAGEMAKER_ENDPOINT_NAME=jumpstart-dft-hf-llm-mistral-small-{YYYYMMDD}-{HHMMSS}
 export SAGEMAKER_REGION=us-west-2
 export SAGEMAKER_VERBOSE_LOGGING=true
 ```

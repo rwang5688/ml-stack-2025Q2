@@ -17,7 +17,17 @@ import sys
 def setup_environment():
     """Set up environment variables for SageMaker integration."""
     # Required SageMaker configuration
-    os.environ['SAGEMAKER_ENDPOINT_NAME'] = 'jumpstart-dft-hf-llm-mistral-small-20250908-025809'
+    # TODO: Replace with your actual SageMaker endpoint name
+    endpoint_name = 'jumpstart-dft-hf-llm-mistral-small-{YYYYMMDD}-{HHMMSS}'
+    
+    if '{YYYYMMDD}' in endpoint_name or '{HHMMSS}' in endpoint_name:
+        print("⚠️  WARNING: You need to replace the endpoint name template with your actual endpoint!")
+        print("   Current template: jumpstart-dft-hf-llm-mistral-small-{YYYYMMDD}-{HHMMSS}")
+        print("   Example actual:   jumpstart-dft-hf-llm-mistral-small-20250908-025809")
+        print("   Please edit setup_env.py and replace the endpoint_name variable.")
+        return False
+    
+    os.environ['SAGEMAKER_ENDPOINT_NAME'] = endpoint_name
     os.environ['SAGEMAKER_REGION'] = 'us-west-2'
     
     # Optional configuration for testing
@@ -66,7 +76,12 @@ if __name__ == "__main__":
     print("=" * 70)
     
     # Set up environment
-    setup_environment()
+    setup_success = setup_environment()
+    
+    if not setup_success:
+        print("\n❌ Setup failed! Please update the endpoint name in setup_env.py")
+        print("=" * 70)
+        sys.exit(1)
     
     # Check if user wants to skip test
     run_test = "--no-test" not in sys.argv
