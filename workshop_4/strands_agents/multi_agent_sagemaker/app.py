@@ -2,6 +2,24 @@ import streamlit as st
 import sys
 import os
 
+# Load environment variables from .env file if it exists
+def load_env_file():
+    """Load environment variables from .env file."""
+    env_file = '.env'
+    if os.path.exists(env_file):
+        with open(env_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key] = value
+        print("✅ Loaded environment variables from .env file")
+    else:
+        print("⚠️  No .env file found. Run 'python setup_env.py' first.")
+
+# Load environment variables
+load_env_file()
+
 # Set environment variable to skip Python execution prompts to prevent UI hanging
 os.environ["STRANDS_AUTO_APPROVE"] = "true"
 

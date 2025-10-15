@@ -118,7 +118,7 @@ export SAGEMAKER_VERBOSE_LOGGING=true
 
 2. Also update `tests/multi_agent_sagemaker/setup_test_env.py` with the same endpoint name.
 
-### 2. Run the Streamlit App
+### 2. Set Up Environment and Run Streamlit App
 
 ```bash
 # Navigate to the multi_agent_sagemaker directory
@@ -131,11 +131,13 @@ python setup_env.py
 This will:
 - Set the required SageMaker endpoint and authentication
 - Validate the configuration
+- Create a .env file for persistent environment variables
 - Confirm the system is ready
 
 After successful environment setup:
 
 ```bash
+# Run the Streamlit app (it will automatically load from .env file)
 streamlit run app.py
 ```
 
