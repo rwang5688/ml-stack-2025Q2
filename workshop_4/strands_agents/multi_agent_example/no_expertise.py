@@ -46,7 +46,7 @@ def general_assistant(query: str) -> str:
     formatted_query = f"Answer this general knowledge question concisely, remembering to start by acknowledging that you are not an expert in this specific area: {query}"
     
     try:
-        print("Routed to General Assistant")
+        print("Routed to General Assistant (Bedrock)")
         bedrock_model = BedrockModel(
             model_id="us.amazon.nova-pro-v1:0",
             temperature=0.3,
@@ -65,4 +65,4 @@ def general_assistant(query: str) -> str:
         return "Sorry, I couldn't provide an answer to your question."
     except Exception as e:
         # Return error message
-        return f"Error processing your question: {str(e)}"
+        return f"Error processing your question via Bedrock: {str(e)}"

@@ -49,7 +49,7 @@ def computer_science_assistant(query: str) -> str:
     formatted_query = f"Please address this computer science or programming question. When appropriate, provide executable code examples and explain the concepts thoroughly: {query}"
     
     try:
-        print("Routed to Computer Science Assistant")
+        print("Routed to Computer Science Assistant (Bedrock)")
         # Create the computer science agent with relevant tools
         bedrock_model = BedrockModel(
             model_id="us.amazon.nova-pro-v1:0",
@@ -69,4 +69,4 @@ def computer_science_assistant(query: str) -> str:
         return "I apologize, but I couldn't process your computer science question. Please try rephrasing or providing more specific details about what you're trying to learn or accomplish."
     except Exception as e:
         # Return specific error message for computer science processing
-        return f"Error processing your computer science query: {str(e)}"
+        return f"Error processing your computer science query via Bedrock: {str(e)}"

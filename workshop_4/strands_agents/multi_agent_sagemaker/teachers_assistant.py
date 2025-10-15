@@ -18,38 +18,23 @@ from computer_science_assistant import computer_science_assistant
 from no_expertise import general_assistant
 
 
-# Define a focused system prompt for file operations
+# Define the teacher system prompt - focused on pure routing
 TEACHER_SYSTEM_PROMPT = """
-You are TeachAssist, a sophisticated educational orchestrator designed to coordinate educational support across multiple subjects. Your role is to:
+You are a routing agent that determines which specialist to call and returns their complete response.
 
-1. Analyze incoming student queries and determine the most appropriate specialized agent to handle them:
-   - Math Agent: For mathematical calculations, problems, and concepts
-   - English Agent: For writing, grammar, literature, and composition
-   - Language Agent: For translation and language-related queries
-   - Computer Science Agent: For programming, algorithms, data structures, and code execution
-   - General Assistant: For all other topics outside these specialized domains
+Available specialists:
+- math_assistant: For mathematical calculations, problems, and concepts
+- english_assistant: For writing, grammar, literature, and composition  
+- language_assistant: For translation and language-related queries
+- computer_science_assistant: For programming, algorithms, data structures, and code execution
+- general_assistant: For all other topics outside these specialized domains
 
-2. Key Responsibilities:
-   - Accurately classify student queries by subject area
-   - Route requests to the appropriate specialized agent
-   - Return the COMPLETE response from the specialized agent without modification
-   - Maintain context and coordinate multi-step problems when needed
+Your process:
+1. Analyze the user's query
+2. Call the appropriate specialist tool with the user's exact query
+3. Return the specialist's response exactly as provided - do not modify, summarize, or add to it
 
-3. Decision Protocol:
-   - If query involves calculations/numbers → Math Agent
-   - If query involves writing/literature/grammar → English Agent
-   - If query involves translation → Language Agent
-   - If query involves programming/coding/algorithms/computer science → Computer Science Agent
-   - If query is outside these specialized areas → General Assistant
-   - For complex queries, coordinate multiple agents as needed
-
-4. Response Protocol:
-   - When a specialized agent provides a response, return that response in full
-   - Do not add additional commentary unless specifically requested
-   - Do not summarize or truncate the specialist's response
-   - The specialist's expertise should be the primary content delivered to the user
-
-Route the query to the appropriate specialist and return their complete response.
+CRITICAL: Your final response must be identical to what the specialist tool returns. Do not add any commentary, questions, or additional text.
 """
 
 # Create the teacher agent with SageMaker integration and specialized assistant tools
@@ -61,8 +46,8 @@ teacher_agent = create_simple_agent(
 
 # Example usage
 if __name__ == "__main__":
-    print("\n📁 Teacher's Assistant Strands Agent (SageMaker) 📁\n")
-    print("Ask a question in any subject area, and I'll route it to the appropriate SageMaker-enabled specialist.")
+    print("\n🎓 Teacher's Assistant CLI (SageMaker) 🎓\n")
+    print("Ask a question in any subject area, and I'll route it to the appropriate SageMaker-powered specialist.")
     print("Type 'exit' to quit.")
 
     # Interactive loop
@@ -73,13 +58,17 @@ if __name__ == "__main__":
                 print("\nGoodbye! 👋")
                 break
 
-            response = teacher_agent(
-                user_input, 
-            )
+            response = teacher_agent(user_input)
             
-            # Extract and print only the relevant content from the specialized agent's response
+            # Debug: Print response structure (matching app.py)
+            print(f"DEBUG - SageMaker CLI response type: {type(response)}")
+            print(f"DEBUG - SageMaker CLI response: {response}")
+            
+            # Simplified response extraction - just convert to string (matching app.py)
             content = str(response)
-            print(content)
+            
+            print(f"DEBUG - SageMaker CLI final content: {content}")
+            print(f"\n{content}")
             
         except KeyboardInterrupt:
             print("\n\nExecution interrupted. Exiting...")

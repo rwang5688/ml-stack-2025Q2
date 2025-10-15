@@ -44,7 +44,7 @@ def english_assistant(query: str) -> str:
     formatted_query = f"Analyze and respond to this English language or literature question, providing clear explanations with examples where appropriate: {query}"
     
     try:
-        print("Routed to English Assistant")
+        print("Routed to English Assistant (Bedrock)")
         
         bedrock_model = BedrockModel(
             model_id="us.amazon.nova-pro-v1:0",
@@ -64,4 +64,4 @@ def english_assistant(query: str) -> str:
         return "I apologize, but I couldn't properly analyze your English language question. Could you please rephrase or provide more context?"
     except Exception as e:
         # Return specific error message for English queries
-        return f"Error processing your English language query: {str(e)}"
+        return f"Error processing your English language query via Bedrock: {str(e)}"

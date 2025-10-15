@@ -44,7 +44,7 @@ def language_assistant(query: str) -> str:
     formatted_query = f"Please address this translation or language learning request, providing cultural context and explanations where helpful: {query}"
     
     try:
-        print("Routed to Language Assistant")
+        print("Routed to Language Assistant (Bedrock)")
         bedrock_model = BedrockModel(
             model_id="us.amazon.nova-pro-v1:0",
             temperature=0.3,
@@ -63,4 +63,4 @@ def language_assistant(query: str) -> str:
         return "I apologize, but I couldn't process your language request. Please ensure you've specified the languages involved and the specific translation or learning need."
     except Exception as e:
         # Return specific error message for language processing
-        return f"Error processing your language query: {str(e)}"
+        return f"Error processing your language query via Bedrock: {str(e)}"

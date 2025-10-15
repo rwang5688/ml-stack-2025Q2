@@ -43,7 +43,7 @@ def math_assistant(query: str) -> str:
     formatted_query = f"Please solve the following mathematical problem, showing all steps and explaining concepts clearly: {query}"
     
     try:
-        print("Routed to Math Assistant")
+        print("Routed to Math Assistant (Bedrock)")
         # Create the math agent with calculator capability
         bedrock_model = BedrockModel(
             model_id="us.amazon.nova-pro-v1:0",
@@ -63,4 +63,4 @@ def math_assistant(query: str) -> str:
         return "I apologize, but I couldn't solve this mathematical problem. Please check if your query is clearly stated or try rephrasing it."
     except Exception as e:
         # Return specific error message for math processing
-        return f"Error processing your mathematical query: {str(e)}"
+        return f"Error processing your mathematical query via Bedrock: {str(e)}"

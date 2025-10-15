@@ -35,45 +35,31 @@ try:
     from computer_science_assistant import computer_science_assistant
     from no_expertise import general_assistant
     
-    # Define the teacher system prompt
+    # Define the teacher system prompt - focused on pure routing
     TEACHER_SYSTEM_PROMPT = """
-    You are TeachAssist, a sophisticated educational orchestrator designed to coordinate educational support across multiple subjects. Your role is to:
+    You are a routing agent that determines which specialist to call and returns their complete response.
 
-    1. Analyze incoming student queries and determine the most appropriate specialized agent to handle them:
-       - Math Agent: For mathematical calculations, problems, and concepts
-       - English Agent: For writing, grammar, literature, and composition
-       - Language Agent: For translation and language-related queries
-       - Computer Science Agent: For programming, algorithms, data structures, and code execution
-       - General Assistant: For all other topics outside these specialized domains
+    Available specialists:
+    - math_assistant: For mathematical calculations, problems, and concepts
+    - english_assistant: For writing, grammar, literature, and composition  
+    - language_assistant: For translation and language-related queries
+    - computer_science_assistant: For programming, algorithms, data structures, and code execution
+    - general_assistant: For all other topics outside these specialized domains
 
-    2. Key Responsibilities:
-       - Accurately classify student queries by subject area
-       - Route requests to the appropriate specialized agent
-       - Return the COMPLETE response from the specialized agent without modification
-       - Maintain context and coordinate multi-step problems when needed
+    Your process:
+    1. Analyze the user's query
+    2. Call the appropriate specialist tool with the user's exact query
+    3. Return the specialist's response exactly as provided - do not modify, summarize, or add to it
 
-    3. Decision Protocol:
-       - If query involves calculations/numbers → Math Agent
-       - If query involves writing/literature/grammar → English Agent
-       - If query involves translation → Language Agent
-       - If query involves programming/coding/algorithms/computer science → Computer Science Agent
-       - If query is outside these specialized areas → General Assistant
-       - For complex queries, coordinate multiple agents as needed
-
-    4. Response Protocol:
-       - When a specialized agent provides a response, return that response in full
-       - Do not add additional commentary unless specifically requested
-       - Do not summarize or truncate the specialist's response
-       - The specialist's expertise should be the primary content delivered to the user
-
-    Route the query to the appropriate specialist and return their complete response.
+    CRITICAL: Your final response must be identical to what the specialist tool returns. Do not add any commentary, questions, or additional text.
     """
 
     # Create the teacher agent with SageMaker integration
-    teacher_agent = create_simple_agent(
-        system_prompt=TEACHER_SYSTEM_PROMPT,
-        tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
-    )
+    def create_teacher_agent():
+        return create_simple_agent(
+            system_prompt=TEACHER_SYSTEM_PROMPT,
+            tools=[math_assistant, language_assistant, english_assistant, computer_science_assistant, general_assistant],
+        )
     
     AGENTS_AVAILABLE = True
 except ImportError as e:
@@ -111,27 +97,29 @@ if prompt := st.chat_input("Ask me anything about math, English, computer scienc
 
     if AGENTS_AVAILABLE:
         try:
-            # Get response from teacher agent
+            # Get response from teacher agent orchestrator
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    response = teacher_agent(prompt)
-                    
-                    # Extract just the text content from the message
-                    if hasattr(response, 'message') and response.message:
-                        message = response.message
-                        if isinstance(message, dict) and 'content' in message:
-                            content_list = message['content']
-                            if isinstance(content_list, list) and len(content_list) > 0:
-                                if isinstance(content_list[0], dict) and 'text' in content_list[0]:
-                                    response_text = content_list[0]['text']
-                                else:
-                                    response_text = str(content_list[0])
-                            else:
-                                response_text = str(message)
-                        else:
-                            response_text = str(message)
-                    else:
+                    try:
+                        # Create fresh teacher agent instance
+                        teacher_agent = create_teacher_agent()
+                        response = teacher_agent(prompt)
+                        
+                        # Debug: Print response structure
+                        print(f"DEBUG - SageMaker response type: {type(response)}")
+                        print(f"DEBUG - SageMaker response: {response}")
+                        
+                        # Simplified response extraction - just convert to string
                         response_text = str(response)
+                        
+                        print(f"DEBUG - SageMaker final content: {response_text}")
+                        
+                        # If response looks like tool call JSON, there's still an issue
+                        if response_text.startswith('[{"name":') or response_text.startswith('{"name":'):
+                            response_text = "I apologize, but there was an issue processing your request. Please try again."
+                            
+                    except Exception as e:
+                        response_text = f"Sorry, I encountered an error: {str(e)}"
                     
                     st.markdown(response_text)
             
@@ -177,4 +165,13 @@ st.sidebar.write("- Real-time responses")
 # Clear chat button
 if st.sidebar.button("Clear Chat History"):
     st.session_state.messages = []
+    # Clear any cached agent state
+    if 'teacher_agent' in st.session_state:
+        del st.session_state['teacher_agent']
+    st.rerun()
+
+# Force cache clear button for debugging
+if st.sidebar.button("🔄 Force Refresh (Debug)"):
+    st.cache_data.clear()
+    st.cache_resource.clear()
     st.rerun()
