@@ -44,7 +44,6 @@ def create_sagemaker_model():
     region = get_aws_region()
     
     # Create the SageMaker AI Model object using official Strands format
-    # Disable streaming to avoid connection issues
     sagemaker_model = SageMakerAIModel(
         endpoint_config={
             "endpoint_name": endpoint_name,
@@ -53,7 +52,7 @@ def create_sagemaker_model():
         payload_config={
             "max_tokens": 1000,
             "temperature": 0.7,
-            "stream": False,  # Disable streaming to prevent connection issues
+            "stream": True,  # Enable streaming for better user experience
         }
     )
     
