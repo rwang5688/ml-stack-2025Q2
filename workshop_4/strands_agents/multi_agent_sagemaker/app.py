@@ -49,8 +49,8 @@ try:
     2. Key Responsibilities:
        - Accurately classify student queries by subject area
        - Route requests to the appropriate specialized agent
-       - Maintain context and coordinate multi-step problems
-       - Ensure cohesive responses when multiple agents are needed
+       - Return the COMPLETE response from the specialized agent without modification
+       - Maintain context and coordinate multi-step problems when needed
 
     3. Decision Protocol:
        - If query involves calculations/numbers → Math Agent
@@ -60,7 +60,13 @@ try:
        - If query is outside these specialized areas → General Assistant
        - For complex queries, coordinate multiple agents as needed
 
-    Always confirm your understanding before routing to ensure accurate assistance.
+    4. Response Protocol:
+       - When a specialized agent provides a response, return that response in full
+       - Do not add additional commentary unless specifically requested
+       - Do not summarize or truncate the specialist's response
+       - The specialist's expertise should be the primary content delivered to the user
+
+    Route the query to the appropriate specialist and return their complete response.
     """
 
     # Create the teacher agent with SageMaker integration
@@ -110,27 +116,22 @@ if prompt := st.chat_input("Ask me anything about math, English, computer scienc
                 with st.spinner("Thinking..."):
                     response = teacher_agent(prompt)
                     
-                    # Debug: Let's see what's in the response object
-                    print(f"DEBUG - Response message: {response.message}")
-                    print(f"DEBUG - Response state: {getattr(response, 'state', 'No state')}")
-                    
-                    # Try to get the full response content
-                    # The terminal shows the full response, so it must be accessible
+                    # Extract just the text content from the message
                     if hasattr(response, 'message') and response.message:
-                        # Try to extract all the content, not just the final message
-                        response_text = str(response.message)
-                        
-                        # If that doesn't work, let's try accessing the state or other attributes
-                        if len(response_text) < 100:  # If it's too short, try other approaches
-                            if hasattr(response, 'state') and response.state:
-                                print(f"DEBUG - Trying state: {response.state}")
-                                # Look for conversation history or full content in state
-                                response_text = str(response.state)
+                        message = response.message
+                        if isinstance(message, dict) and 'content' in message:
+                            content_list = message['content']
+                            if isinstance(content_list, list) and len(content_list) > 0:
+                                if isinstance(content_list[0], dict) and 'text' in content_list[0]:
+                                    response_text = content_list[0]['text']
+                                else:
+                                    response_text = str(content_list[0])
+                            else:
+                                response_text = str(message)
+                        else:
+                            response_text = str(message)
                     else:
                         response_text = str(response)
-                    
-                    print(f"DEBUG - Final response text length: {len(response_text)}")
-                    print(f"DEBUG - Final response text: {response_text[:200]}...")
                     
                     st.markdown(response_text)
             
