@@ -23,9 +23,15 @@ this feature. Verify your model's capabilities before implementing tool-based wo
 """
 
 import boto3
+import warnings
 from strands import Agent
 from strands.models.sagemaker import SageMakerAIModel
 from config import get_sagemaker_endpoint, get_aws_region
+
+# Suppress urllib3 warnings about unclosed connections
+warnings.filterwarnings("ignore", message=".*unclosed.*", category=ResourceWarning)
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def create_sagemaker_model():
@@ -51,6 +57,17 @@ def create_sagemaker_model():
     )
     
     return sagemaker_model
+
+
+def cleanup_connections():
+    """Clean up any lingering HTTP connections."""
+    try:
+        import urllib3
+        urllib3.disable_warnings()
+        # Force cleanup of connection pools
+        urllib3.poolmanager.clear()
+    except:
+        pass
 
 
 def create_simple_agent(system_prompt: str, tools=None):

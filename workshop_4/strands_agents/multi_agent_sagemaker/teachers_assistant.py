@@ -81,3 +81,10 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"\nAn error occurred: {str(e)}")
             print("Please try asking a different question.")
+    
+    # Clean up connections on exit
+    try:
+        from sagemaker_model import cleanup_connections
+        cleanup_connections()
+    except:
+        pass
