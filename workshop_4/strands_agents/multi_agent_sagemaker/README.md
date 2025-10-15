@@ -1,4 +1,4 @@
-# SageMaker Multi-Agent System
+# Demo: Multi-Agent with Strands Agents (Amazon SageMaker JumpStart)
 
 This is a multi-agent system powered by Strands Agents that uses Amazon SageMaker Inference Endpoints for all model inference calls. The system maintains the same functionality as the original multi_agent_example but routes all LLM requests through SageMaker endpoints.
 

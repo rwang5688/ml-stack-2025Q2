@@ -1,4 +1,4 @@
-# Bedrock Multi-Agent System
+# Demo: Multi-Agent with Strands Agents (Amazon Bedrock)
 
 This is a multi-agent system powered by Strands Agents that uses Amazon Bedrock for all model inference calls. The system demonstrates a sophisticated educational orchestrator where specialized agents work together under the coordination of a central Teacher's Assistant to provide expert responses across multiple subject domains.
 
