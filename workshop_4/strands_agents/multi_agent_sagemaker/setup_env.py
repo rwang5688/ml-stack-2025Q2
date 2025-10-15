@@ -46,6 +46,8 @@ def setup_environment():
     print("   - Running the Streamlit app: streamlit run app.py")
     print("   - Testing individual agents")
     print("   - SageMaker inference calls")
+    
+    return True
 
 
 def run_config_test():
