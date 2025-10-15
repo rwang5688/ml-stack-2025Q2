@@ -109,7 +109,23 @@ if prompt := st.chat_input("Ask me anything about math, English, computer scienc
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     response = teacher_agent(prompt)
-                    response_text = str(response)
+                    
+                    # Try different ways to extract the response content
+                    if hasattr(response, 'content'):
+                        response_text = str(response.content)
+                    elif hasattr(response, 'text'):
+                        response_text = str(response.text)
+                    elif hasattr(response, 'message'):
+                        response_text = str(response.message)
+                    else:
+                        response_text = str(response)
+                    
+                    # Debug: Print response info to terminal
+                    print(f"DEBUG - Response type: {type(response)}")
+                    print(f"DEBUG - Response attributes: {dir(response)}")
+                    print(f"DEBUG - Response length: {len(response_text)}")
+                    print(f"DEBUG - Full response text: {response_text}")
+                    
                     st.markdown(response_text)
             
             # Add assistant response to chat history
