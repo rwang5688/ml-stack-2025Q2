@@ -110,21 +110,27 @@ if prompt := st.chat_input("Ask me anything about math, English, computer scienc
                 with st.spinner("Thinking..."):
                     response = teacher_agent(prompt)
                     
-                    # Try different ways to extract the response content
-                    if hasattr(response, 'content'):
-                        response_text = str(response.content)
-                    elif hasattr(response, 'text'):
-                        response_text = str(response.text)
-                    elif hasattr(response, 'message'):
+                    # Debug: Let's see what's in the response object
+                    print(f"DEBUG - Response message: {response.message}")
+                    print(f"DEBUG - Response state: {getattr(response, 'state', 'No state')}")
+                    
+                    # Try to get the full response content
+                    # The terminal shows the full response, so it must be accessible
+                    if hasattr(response, 'message') and response.message:
+                        # Try to extract all the content, not just the final message
                         response_text = str(response.message)
+                        
+                        # If that doesn't work, let's try accessing the state or other attributes
+                        if len(response_text) < 100:  # If it's too short, try other approaches
+                            if hasattr(response, 'state') and response.state:
+                                print(f"DEBUG - Trying state: {response.state}")
+                                # Look for conversation history or full content in state
+                                response_text = str(response.state)
                     else:
                         response_text = str(response)
                     
-                    # Debug: Print response info to terminal
-                    print(f"DEBUG - Response type: {type(response)}")
-                    print(f"DEBUG - Response attributes: {dir(response)}")
-                    print(f"DEBUG - Response length: {len(response_text)}")
-                    print(f"DEBUG - Full response text: {response_text}")
+                    print(f"DEBUG - Final response text length: {len(response_text)}")
+                    print(f"DEBUG - Final response text: {response_text[:200]}...")
                     
                     st.markdown(response_text)
             
